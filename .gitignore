@@ -1,0 +1,8 @@
+.env
+data
+.reloadtrigger
+tmp
+key.json
+assets/images/tests/*
+!assets/images/tests/test.txt
+*.asc
