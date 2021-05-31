@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/muktiarafi/rodavis-api/internal/driver"
+	"github.com/muktiarafi/rodavis-api/internal/entity"
 	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/repository"
 	"github.com/muktiarafi/rodavis-api/internal/service"
@@ -37,6 +38,8 @@ var (
 	assetsPath string
 )
 
+var admin *model.LoginDTO
+
 func TestMain(m *testing.M) {
 	router = chi.NewRouter()
 	db := &driver.DB{
@@ -57,6 +60,28 @@ func TestMain(m *testing.M) {
 	val := validation.NewValidator(v, trans)
 	userHandler := NewUserHandler(val, userSRV)
 	userHandler.Route(router)
+
+	reportRepo := repository.NewReportRepository(db)
+	predictAPIURL := os.Getenv("PREDICT_API_URL")
+	reportSRV := service.NewReportService(reportRepo, userRepo, predictAPIURL)
+	reportHandler := NewReportHandler(val, reportSRV)
+	reportHandler.Route(router)
+
+	adminCreateUserDTO := &model.CreateUserDTO{
+		Name:        "yahahaha",
+		Email:       "telolet@gmail.com",
+		PhoneNumber: "+6234564876902",
+		Password:    "$2y$12$.EpYweFep8NzqNz0CiVKkOOQh/MCByE7DUIIyeFo5RVs7AuYibFOu",
+	}
+	createdAdmin, err := createAdmin(adminCreateUserDTO, db)
+	if err != nil {
+		panic(err)
+	}
+
+	admin = &model.LoginDTO{
+		Email:    createdAdmin.Email,
+		Password: "12345678",
+	}
 
 	code := m.Run()
 
@@ -121,4 +146,34 @@ func assertResponseCode(t testing.TB, want, got int) {
 	if got != want {
 		t.Errorf("Expecting status code %d, but got %d instead", want, got)
 	}
+}
+
+func createAdmin(createUserDTO *model.CreateUserDTO, db *driver.DB) (*entity.User, error) {
+
+	stmt := `INSERT INTO users (name, phone_number, email, password, role)
+	VALUES ($1, $2, $3, $4, $5)
+	RETURNING *`
+
+	newUser := new(entity.User)
+	if err := db.SQL.QueryRow(
+		stmt,
+		createUserDTO.Name,
+		createUserDTO.PhoneNumber,
+		createUserDTO.Email,
+		createUserDTO.Password,
+		"ADMIN",
+	).Scan(
+		&newUser.ID,
+		&newUser.Name,
+		&newUser.PhoneNumber,
+		&newUser.Email,
+		&newUser.Password,
+		&newUser.Role,
+		&newUser.CreatedAt,
+		&newUser.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	return newUser, nil
 }
