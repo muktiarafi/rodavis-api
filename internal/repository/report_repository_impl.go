@@ -71,7 +71,7 @@ func (r *ReportRepositoryImpl) GetAll(limit, lastseenID uint64) ([]*entity.Repor
 
 	const op = "ReportRepositoryImpl.GetAll"
 	queryBuilder := squirrel.
-		Select("r.id", "name", "status", "image_url", "note", "address", "lat", "lng", "date_reported").
+		Select("r.id", "name", "status", "image_url", "classes", "note", "address", "lat", "lng", "date_reported").
 		From("users AS u").Join("reports AS r ON u.id = r.user_id").PlaceholderFormat(squirrel.Dollar).OrderBy("r.id DESC")
 
 	if limit > 0 {
@@ -113,6 +113,7 @@ func (r *ReportRepositoryImpl) GetAll(limit, lastseenID uint64) ([]*entity.Repor
 			&report.ReporterName,
 			&report.Status,
 			&report.ImageURL,
+			&cls,
 			&report.Note,
 			&report.Address,
 			&location.Lat,
@@ -143,7 +144,7 @@ func (r *ReportRepositoryImpl) GetAllByUserID(userID int, limit, lastseenID uint
 
 	const op = "ReportRepositoryImpl.GetAll"
 	queryBuilder := squirrel.
-		Select("r.id", "name", "status", "image_url", "note", "address", "lat", "lng", "date_reported").
+		Select("r.id", "name", "status", "image_url", "classes", "note", "address", "lat", "lng", "date_reported").
 		From("users AS u").Join("reports AS r ON u.id = r.user_id").PlaceholderFormat(squirrel.Dollar).OrderBy("r.id DESC").
 		Where(squirrel.Eq{
 			"r.user_id": userID,
@@ -188,6 +189,7 @@ func (r *ReportRepositoryImpl) GetAllByUserID(userID int, limit, lastseenID uint
 			&report.ReporterName,
 			&report.Status,
 			&report.ImageURL,
+			&cls,
 			&report.Note,
 			&report.Address,
 			&location.Lat,
