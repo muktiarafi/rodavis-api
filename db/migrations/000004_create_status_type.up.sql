@@ -1,0 +1,1 @@
+CREATE TYPE status AS ENUM ('Reported', 'Under Repair', 'Completed', 'Rejected')
