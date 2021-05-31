@@ -24,7 +24,10 @@ jobs:
         run: go mod download
 
       - name: Test
-        run: go test -v ./...
+        run: |
+          docker run -p 33768:33768 muktiarafi/rodavis-predict-api-stub -d
+          export PREDICT_API_URL=http://localhost:33768/predict
+          go test -v ./...
   
   build:
     needs: [test]
