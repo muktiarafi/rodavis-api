@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	"github.com/go-chi/chi/v5"
+	mid "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/muktiarafi/rodavis-api/internal/api"
 	"github.com/muktiarafi/rodavis-api/internal/config"
@@ -30,6 +31,7 @@ type App struct {
 func New() *App {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestLogger)
+	r.Use(mid.Recoverer)
 
 	const op = "server.New"
 	logger.Notice(op, "Connecting to Database")
