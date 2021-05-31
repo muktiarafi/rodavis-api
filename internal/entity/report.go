@@ -12,7 +12,7 @@ type Report struct {
 	Note         string    `json:"note"`
 	Address      string    `json:"address"`
 	Location     *Location `json:"location"`
-	DateReported time.Time
+	DateReported time.Time `json:"dateReported"`
 }
 
 type Location struct {
