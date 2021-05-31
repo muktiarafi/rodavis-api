@@ -67,7 +67,7 @@ jobs:
           --platform managed \
           --allow-unauthenticated \
           --add-cloudsql-instances ${{ secrets.INSTANCE_CONNECTION_NAME }} \
-          --update-env-vars INSTANCE_CONNECTION_NAME="${{ secrets.INSTANCE_CONNECTION_NAME }}" \
+          --set-env-vars="INSTANCE_CONNECTION_NAME=${{ secrets.INSTANCE_CONNECTION_NAME }}" \
           --set-env-vars="DB_HOST=${{ secrets.DB_HOST }}" \
           --set-env-vars="DB_PORT=${{ secrets.DB_PORT }}" \
           --set-env-vars="DB_USER=${{ secrets.DB_USER }}" \
