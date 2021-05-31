@@ -33,7 +33,7 @@ func New() *App {
 
 	const op = "server.New"
 	logger.Notice(op, "Connecting to Database")
-	db, err := driver.ConnectSQL(config.PostgresDSN(), true)
+	db, err := driver.ConnectSQL(config.CloudSQLConnection(), false)
 	if err != nil {
 		_, file, line, _ := runtime.Caller(0)
 		logger.Error(op, &model.SourceLocation{
