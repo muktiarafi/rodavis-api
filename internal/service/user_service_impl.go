@@ -13,13 +13,11 @@ import (
 
 type UserServiceImpl struct {
 	repository.UserRepository
-	ImagePersistence utils.ImagePersistence
 }
 
-func NewUserService(userRepo repository.UserRepository, imgPersistence utils.ImagePersistence) UserService {
+func NewUserService(userRepo repository.UserRepository) UserService {
 	return &UserServiceImpl{
-		UserRepository:   userRepo,
-		ImagePersistence: imgPersistence,
+		UserRepository: userRepo,
 	}
 }
 

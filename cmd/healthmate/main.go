@@ -37,7 +37,6 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		defer app.DB.Close()
-		defer app.Client.Close()
 
 		httpServer.Shutdown(ctx)
 		close(done)

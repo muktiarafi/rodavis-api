@@ -20,7 +20,6 @@ import (
 	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/repository"
 	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
 	"github.com/muktiarafi/rodavis-api/internal/validation"
 	"github.com/ory/dockertest/v3"
 )
@@ -52,8 +51,7 @@ func TestMain(m *testing.M) {
 	assetsPath = filepath.Join(pwd, "..", "..", "assets")
 	imagePath = filepath.Join(assetsPath, "images")
 	savePath = filepath.Join(imagePath, "tests")
-	imgPersist := utils.NewLocalImagePersistence(savePath)
-	userSRV := service.NewUserService(userRepo, imgPersist)
+	userSRV := service.NewUserService(userRepo)
 
 	v := validator.New()
 	trans := validation.NewDefaultTranslator(v)
