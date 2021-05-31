@@ -11,6 +11,7 @@ import (
 type UserPayload struct {
 	ID    int    `json:"id"`
 	Email string `json:"email"`
+	Role  string `json:"role"`
 }
 
 var jwtKey = os.Getenv("JWT_KEY")

@@ -46,7 +46,7 @@ func (s *UserServiceImpl) Create(createUserDTO *model.CreateUserDTO) (*model.Use
 		return nil, err
 	}
 
-	token, err := utils.CreateToken(&utils.UserPayload{newUser.ID, newUser.Email})
+	token, err := utils.CreateToken(&utils.UserPayload{newUser.ID, newUser.Email, newUser.Role})
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
@@ -90,7 +90,7 @@ func (s *UserServiceImpl) Auth(loginDTO *model.LoginDTO) (*model.UserDTO, error)
 		)
 	}
 
-	token, err := utils.CreateToken(&utils.UserPayload{user.ID, user.Email})
+	token, err := utils.CreateToken(&utils.UserPayload{user.ID, user.Email, user.Role})
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
