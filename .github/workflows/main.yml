@@ -29,7 +29,7 @@ jobs:
           export PREDICT_API_URL=http://localhost:33768/predict
           go test -v ./...
   
-  build:
+  build_and_deploy:
     needs: [test]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -57,4 +57,22 @@ jobs:
       
       - name: Push to GCR
         run: docker push $IMAGE_NAME
-        
+
+      - name: deploy to cloud run
+        run: |
+          gcloud run deploy rodavis-api \
+          --project ${{ secrets.GCP_PROJECT_ID }} \
+          --image $IMAGE_NAME \
+          --region asia-southeast2 \
+          --platform managed \
+          --allow-unauthenticated \
+          --add-cloudsql-instances ${{ secrets.INSTANCE_CONNECTION_NAME }} \
+          --update-env-vars INSTANCE_CONNECTION_NAME="${{ secrets.INSTANCE_CONNECTION_NAME }}" \
+          --set-env-vars="DB_HOST=${{ secrets.DB_HOST }}" \
+          --set-env-vars="DB_PORT=${{ secrets.DB_PORT }}" \
+          --set-env-vars="DB_USER=${{ secrets.DB_USER }}" \
+          --set-env-vars="DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+          --set-env-vars="DB_NAME=${{ secrets.DB_NAME }}" \
+          --set-env-vars="JWT_KEY=${{ secrets.JWT_KEY }}" \
+          --set-env-vars="PREDICT_API_URL=${{ secrets.PREDICT_API_URL }}"
+      
