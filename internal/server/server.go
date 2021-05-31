@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"log"
@@ -9,7 +8,6 @@ import (
 	"os"
 	"runtime"
 
-	"cloud.google.com/go/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/muktiarafi/rodavis-api/internal/api"
@@ -21,15 +19,12 @@ import (
 	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/repository"
 	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
 	"github.com/muktiarafi/rodavis-api/internal/validation"
-	"google.golang.org/api/option"
 )
 
 type App struct {
 	*chi.Mux
 	*sql.DB
-	*storage.Client
 }
 
 func New() *App {
@@ -49,29 +44,19 @@ func New() *App {
 		log.Fatal(err)
 	}
 	userRepo := repository.NewUserRepository(db)
-
-	ctx := context.Background()
-	logger.Notice(op, "Connecting to Cloud Storage")
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile("key.json"))
-	if err != nil {
-		_, file, line, _ := runtime.Caller(0)
-		logger.Error(op, &model.SourceLocation{
-			File:     file,
-			Line:     line,
-			Function: "storage.NewClient",
-		}, err)
-		log.Fatal(err)
-	}
-	bucketName := os.Getenv("BUCKET_NAME")
-	bucket := client.Bucket(bucketName)
-	cloudImgPersistence := utils.NewCloudImagePersistence(ctx, bucket, bucketName)
-	userSRV := service.NewUserService(userRepo, cloudImgPersistence)
+	userSRV := service.NewUserService(userRepo)
 
 	val := validator.New()
 	trans := validation.NewDefaultTranslator(val)
 	v := validation.NewValidator(val, trans)
 	userHandler := handler.NewUserHandler(v, userSRV)
 	userHandler.Route(r)
+
+	predictAPIURL := os.Getenv("PREDICT_API_URL")
+	reportRepo := repository.NewReportRepository(db)
+	reportSRV := service.NewReportService(reportRepo, userRepo, predictAPIURL)
+	reportHandler := handler.NewReportHandler(v, reportSRV)
+	reportHandler.Route(r)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		err := api.NewSingleMessageException(
@@ -84,9 +69,8 @@ func New() *App {
 	})
 
 	app := &App{
-		Mux:    r,
-		DB:     db.SQL,
-		Client: client,
+		Mux: r,
+		DB:  db.SQL,
 	}
 	return app
 }
