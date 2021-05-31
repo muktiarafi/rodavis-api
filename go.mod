@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/storage v1.15.0
+	github.com/Masterminds/squirrel v1.5.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/go-chi/chi/v5 v5.0.3
