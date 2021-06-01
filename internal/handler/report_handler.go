@@ -79,9 +79,10 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 
 	lat, err := strconv.ParseFloat(latStr, 32)
 	if err != nil {
-		exc := api.NewExceptionWithSourceLocation(
+		exc := api.NewSingleMessageException(
+			api.EINVALID,
 			op,
-			"strconv.ParseFloat",
+			"Invalid float argument",
 			err,
 		)
 		api.SendError(w, exc)
@@ -89,9 +90,10 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 	}
 	lng, err := strconv.ParseFloat(lngStr, 32)
 	if err != nil {
-		exc := api.NewExceptionWithSourceLocation(
+		exc := api.NewSingleMessageException(
+			api.EINVALID,
 			op,
-			"strconv.ParseFloat",
+			"Invalid float argument",
 			err,
 		)
 		api.SendError(w, exc)
@@ -123,12 +125,34 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 
 	var limit uint64
 	var lastseenID uint64
+	var err error
+	const op = "ReportHandler.GetAllReport"
 	if limitStr != "" {
-		limit, _ = strconv.ParseUint(limitStr, 10, 64)
+		limit, err = strconv.ParseUint(limitStr, 10, 64)
+		if err != nil {
+			exc := api.NewSingleMessageException(
+				op,
+				api.EINVALID,
+				"Invalid limit argument",
+				err,
+			)
+			api.SendError(w, exc)
+			return
+		}
 	}
 
 	if lastseenIDStr != "" {
-		lastseenID, _ = strconv.ParseUint(lastseenIDStr, 10, 64)
+		lastseenID, err = strconv.ParseUint(lastseenIDStr, 10, 64)
+		if err != nil {
+			exc := api.NewSingleMessageException(
+				op,
+				api.EINVALID,
+				"Invalid lastseenid argument",
+				err,
+			)
+			api.SendError(w, exc)
+			return
+		}
 	}
 
 	reports, err := h.ReportService.GetAll(r.Context(), limit, lastseenID)
@@ -141,7 +165,8 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request) {
-	userPayload, err := api.UserPayloadFromContext("ReportHandler.GetAllUserReport", r)
+	const op = "ReportHandler.GetAllUserReport"
+	userPayload, err := api.UserPayloadFromContext(op, r)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -153,11 +178,31 @@ func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request)
 	var limit uint64
 	var lastseenID uint64
 	if limitStr != "" {
-		limit, _ = strconv.ParseUint(limitStr, 10, 64)
+		limit, err = strconv.ParseUint(limitStr, 10, 64)
+		if err != nil {
+			exc := api.NewSingleMessageException(
+				api.EINVALID,
+				op,
+				"invalid limit argument",
+				err,
+			)
+			api.SendError(w, exc)
+			return
+		}
 	}
 
 	if lastseenIDStr != "" {
-		lastseenID, _ = strconv.ParseUint(lastseenIDStr, 10, 64)
+		lastseenID, err = strconv.ParseUint(lastseenIDStr, 10, 64)
+		if err != nil {
+			exc := api.NewSingleMessageException(
+				api.EINVALID,
+				op,
+				"invalid lastseenid argument",
+				err,
+			)
+			api.SendError(w, exc)
+			return
+		}
 	}
 
 	reports, err := h.ReportService.GetAllByUserID(r.Context(), userPayload.ID, limit, lastseenID)
