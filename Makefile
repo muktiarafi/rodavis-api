@@ -11,7 +11,7 @@ migrate-down:
 	$(migrate) -verbose down
 
 run:
-	go run ./cmd/healtmate/main.go
+	go run ./cmd/rodavis/main.go
 
 dev:
 	$(compose) -f docker-compose.dev.yml up
