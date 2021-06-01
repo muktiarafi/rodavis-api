@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -82,7 +83,7 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 		exc := api.NewSingleMessageException(
 			api.EINVALID,
 			op,
-			"Invalid float argument",
+			fmt.Sprintf("Invalid %s as argument for Latitude. Latitude must be float.", latStr),
 			err,
 		)
 		api.SendError(w, exc)
@@ -93,7 +94,7 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 		exc := api.NewSingleMessageException(
 			api.EINVALID,
 			op,
-			"Invalid float argument",
+			fmt.Sprintf("Invalid %s as argument for Longitude. Longitude must be float.", lngStr),
 			err,
 		)
 		api.SendError(w, exc)
