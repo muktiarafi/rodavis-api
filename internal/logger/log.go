@@ -1,9 +1,9 @@
 package logger
 
 import (
-	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 )
 
 type HTTPRequest struct {

@@ -3,7 +3,7 @@ package service
 import (
 	"mime/multipart"
 
-	"github.com/muktiarafi/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 )
 
 type ReportService interface {

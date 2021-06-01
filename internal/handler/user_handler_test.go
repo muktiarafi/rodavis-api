@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/muktiarafi/rodavis-api/internal/entity"
-	"github.com/muktiarafi/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 )
 
 func TestUserHandlerCreate(t *testing.T) {

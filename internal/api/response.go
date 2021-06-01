@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/muktiarafi/rodavis-api/internal/logger"
-	"github.com/muktiarafi/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/logger"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 )
 
 type Response struct {

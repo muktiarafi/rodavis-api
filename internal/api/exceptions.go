@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/muktiarafi/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 )
 
 const (

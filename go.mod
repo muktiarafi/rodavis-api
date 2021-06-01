@@ -1,4 +1,4 @@
-module github.com/muktiarafi/rodavis-api
+module gitlab.com/harta-tahta-coursera/rodavis-api
 
 go 1.16
 
@@ -16,9 +16,5 @@ require (
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/ory/dockertest/v3 v3.6.5
 	github.com/rs/zerolog v1.22.0
-	github.com/stretchr/testify v1.6.1 // indirect
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/sys v0.0.0-20210412220455-f1c623a9e750 // indirect
-	google.golang.org/genproto v0.0.0-20210420162539-3c870d7478d2 // indirect
-	google.golang.org/grpc v1.37.0 // indirect
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 )

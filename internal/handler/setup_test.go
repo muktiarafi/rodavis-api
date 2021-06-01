@@ -15,13 +15,13 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
-	"github.com/muktiarafi/rodavis-api/internal/driver"
-	"github.com/muktiarafi/rodavis-api/internal/entity"
-	"github.com/muktiarafi/rodavis-api/internal/model"
-	"github.com/muktiarafi/rodavis-api/internal/repository"
-	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/validation"
 	"github.com/ory/dockertest/v3"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/repository"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/service"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/validation"
 )
 
 var (

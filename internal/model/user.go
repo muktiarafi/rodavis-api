@@ -1,6 +1,6 @@
 package model
 
-import "github.com/muktiarafi/rodavis-api/internal/entity"
+import "gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 
 type CreateUserDTO struct {
 	Name        string `json:"name" validate:"required,min=4"`

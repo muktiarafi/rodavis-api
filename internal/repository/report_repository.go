@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/muktiarafi/rodavis-api/internal/entity"
+import "gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 
 type ReportRepository interface {
 	Create(userID int, report *entity.Report) (*entity.Report, error)

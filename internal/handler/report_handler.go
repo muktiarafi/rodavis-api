@@ -6,12 +6,12 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/muktiarafi/rodavis-api/internal/api"
-	"github.com/muktiarafi/rodavis-api/internal/entity"
-	"github.com/muktiarafi/rodavis-api/internal/middleware"
-	"github.com/muktiarafi/rodavis-api/internal/model"
-	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/validation"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/middleware"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/service"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/validation"
 )
 
 type ReportHandler struct {

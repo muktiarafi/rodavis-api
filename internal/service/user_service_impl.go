@@ -3,11 +3,11 @@ package service
 import (
 	"database/sql"
 
-	"github.com/muktiarafi/rodavis-api/internal/api"
-	"github.com/muktiarafi/rodavis-api/internal/entity"
-	"github.com/muktiarafi/rodavis-api/internal/model"
-	"github.com/muktiarafi/rodavis-api/internal/repository"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/repository"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

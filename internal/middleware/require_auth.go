@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/muktiarafi/rodavis-api/internal/api"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/utils"
 )
 
 func RequireAuth(next http.Handler) http.Handler {

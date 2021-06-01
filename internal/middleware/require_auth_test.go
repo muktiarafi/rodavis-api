@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/muktiarafi/rodavis-api/internal/model"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/utils"
 )
 
 func TestRequireAuth(t *testing.T) {

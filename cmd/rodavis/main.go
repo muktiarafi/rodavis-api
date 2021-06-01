@@ -8,9 +8,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/muktiarafi/rodavis-api/internal/logger"
-	"github.com/muktiarafi/rodavis-api/internal/model"
-	"github.com/muktiarafi/rodavis-api/internal/server"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/logger"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/server"
 )
 
 func main() {

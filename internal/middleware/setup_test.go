@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/muktiarafi/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
 )
 
 var router *chi.Mux

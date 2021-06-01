@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	"github.com/jackc/pgconn"
-	"github.com/muktiarafi/rodavis-api/internal/api"
-	"github.com/muktiarafi/rodavis-api/internal/driver"
-	"github.com/muktiarafi/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 )
 
 type UserRepositoryImpl struct {

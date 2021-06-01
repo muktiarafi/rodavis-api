@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/felixge/httpsnoop"
-	"github.com/muktiarafi/rodavis-api/internal/logger"
 	"github.com/rs/zerolog"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/logger"
 )
 
 func RequestLogger(next http.Handler) http.Handler {
