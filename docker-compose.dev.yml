@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     restart: always
-    container_name: health-mate-api
+    container_name: rodavis-api
     ports:
       - 8080:8080
     depends_on:
