@@ -6,26 +6,21 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/muktiarafi/rodavis-api/internal/model"
 )
-
-type UserPayload struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
-}
 
 var jwtKey = os.Getenv("JWT_KEY")
 
 type claims struct {
-	*UserPayload
+	*model.UserPayload
 	jwt.StandardClaims
 }
 
-func CreateToken(userPayload *UserPayload) (string, error) {
+func CreateToken(userPayload *model.UserPayload) (string, error) {
 	return CreateTokenWithExpire(userPayload, time.Now().Add(336*time.Hour).Unix())
 }
 
-func CreateTokenWithExpire(userPayload *UserPayload, exp int64) (string, error) {
+func CreateTokenWithExpire(userPayload *model.UserPayload, exp int64) (string, error) {
 	sub := strconv.Itoa(userPayload.ID)
 	claims := &claims{
 		UserPayload: userPayload,
@@ -45,7 +40,7 @@ func CreateTokenWithExpire(userPayload *UserPayload, exp int64) (string, error) 
 	return token, nil
 }
 
-func ParseToken(token string) (*jwt.Token, *UserPayload, error) {
+func ParseToken(token string) (*jwt.Token, *model.UserPayload, error) {
 	claims := &claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(jwtKey), nil

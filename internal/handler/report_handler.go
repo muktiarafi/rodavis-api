@@ -11,7 +11,6 @@ import (
 	"github.com/muktiarafi/rodavis-api/internal/middleware"
 	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
 	"github.com/muktiarafi/rodavis-api/internal/validation"
 )
 
@@ -40,13 +39,10 @@ func (h *ReportHandler) Route(mux *chi.Mux) {
 }
 
 func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
-	userPayload, ok := r.Context().Value("userPayload").(*utils.UserPayload)
-	if !ok {
-		exc := &api.Exception{
-			Op:  "ReportHandler.NewReport",
-			Err: errors.New("missing userpayload in context"),
-		}
-		api.SendError(w, exc)
+	const op = "ReportHandler.NewReport"
+	userPayload, err := api.UserPayloadFromContext(op, r)
+	if err != nil {
+		api.SendError(w, err)
 		return
 	}
 
@@ -57,7 +53,6 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 	address := r.FormValue("address")
 	note := r.FormValue("note")
 
-	const op = "ReportHandler.NewReport"
 	image, header, err := r.FormFile("image")
 	if err != nil {
 		exc := api.NewSingleMessageException(
@@ -146,13 +141,9 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request) {
-	userPayload, ok := r.Context().Value("userPayload").(*utils.UserPayload)
-	if !ok {
-		exc := &api.Exception{
-			Op:  "ReportHandler.GetAllUserReport",
-			Err: errors.New("missing userpayload in context"),
-		}
-		api.SendError(w, exc)
+	userPayload, err := api.UserPayloadFromContext("ReportHandler.GetAllUserReport", r)
+	if err != nil {
+		api.SendError(w, err)
 		return
 	}
 
@@ -180,13 +171,9 @@ func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request)
 
 func (h *ReportHandler) UpdateReport(w http.ResponseWriter, r *http.Request) {
 	const op = "ReportHandler.UpdateReport"
-	userPayload, ok := r.Context().Value("userPayload").(*utils.UserPayload)
-	if !ok {
-		exc := &api.Exception{
-			Op:  op,
-			Err: errors.New("missing userpayload in context"),
-		}
-		api.SendError(w, exc)
+	userPayload, err := api.UserPayloadFromContext(op, r)
+	if err != nil {
+		api.SendError(w, err)
 		return
 	}
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/muktiarafi/rodavis-api/internal/api"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
 )
 
 var router *chi.Mux
@@ -23,8 +22,8 @@ func TestMain(m *testing.M) {
 }
 
 func testRequireAuthHandler(w http.ResponseWriter, r *http.Request) {
-	userPayload, ok := r.Context().Value("userPayload").(*utils.UserPayload)
-	if !ok {
+	userPayload, err := api.UserPayloadFromContext("", r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

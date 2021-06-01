@@ -5,12 +5,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/utils"
 )
 
 func TestRequireAuth(t *testing.T) {
 	t.Run("Pass valid token", func(t *testing.T) {
-		userPayload := &utils.UserPayload{
+		userPayload := &model.UserPayload{
 			ID:    1,
 			Email: "bambank@gmai.com",
 		}

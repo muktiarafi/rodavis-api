@@ -22,3 +22,9 @@ type LoginDTO struct {
 type UpdateUser struct {
 	Name string `validate:"min=4"`
 }
+
+type UserPayload struct {
+	ID    int    `json:"id"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}

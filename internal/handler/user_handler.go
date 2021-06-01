@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -9,7 +8,6 @@ import (
 	"github.com/muktiarafi/rodavis-api/internal/middleware"
 	"github.com/muktiarafi/rodavis-api/internal/model"
 	"github.com/muktiarafi/rodavis-api/internal/service"
-	"github.com/muktiarafi/rodavis-api/internal/utils"
 	"github.com/muktiarafi/rodavis-api/internal/validation"
 )
 
@@ -76,13 +74,9 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	userPayload, ok := r.Context().Value("userPayload").(*utils.UserPayload)
-	if !ok {
-		exc := &api.Exception{
-			Op:  "UserHandler.GetUser",
-			Err: errors.New("missing userpayload in context"),
-		}
-		api.SendError(w, exc)
+	userPayload, err := api.UserPayloadFromContext("UserHandler.GetUser", r)
+	if err != nil {
+		api.SendError(w, err)
 		return
 	}
 

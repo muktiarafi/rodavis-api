@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"strings"
@@ -48,7 +47,7 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "userPayload", payload)
+		ctx := api.UserPayloadToContext(payload, r)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
