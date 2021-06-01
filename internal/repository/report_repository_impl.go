@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/Masterminds/squirrel"
@@ -20,8 +21,8 @@ func NewReportRepository(db *driver.DB) ReportRepository {
 	}
 }
 
-func (r *ReportRepositoryImpl) Create(userID int, report *entity.Report) (*entity.Report, error) {
-	ctx, cancel := newDBContext()
+func (r *ReportRepositoryImpl) Create(ctx context.Context, userID int, report *entity.Report) (*entity.Report, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	stmt := `INSERT INTO reports (image_url, classes, note, address, lat, lng, user_id)
@@ -65,8 +66,8 @@ func (r *ReportRepositoryImpl) Create(userID int, report *entity.Report) (*entit
 	return report, nil
 }
 
-func (r *ReportRepositoryImpl) GetAll(limit, lastseenID uint64) ([]*entity.Report, error) {
-	ctx, cancel := newDBContext()
+func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uint64) ([]*entity.Report, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	const op = "ReportRepositoryImpl.GetAll"
@@ -138,8 +139,8 @@ func (r *ReportRepositoryImpl) GetAll(limit, lastseenID uint64) ([]*entity.Repor
 	return reports, nil
 }
 
-func (r *ReportRepositoryImpl) GetAllByUserID(userID int, limit, lastseenID uint64) ([]*entity.Report, error) {
-	ctx, cancel := newDBContext()
+func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, limit, lastseenID uint64) ([]*entity.Report, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	const op = "ReportRepositoryImpl.GetAll"
@@ -214,8 +215,8 @@ func (r *ReportRepositoryImpl) GetAllByUserID(userID int, limit, lastseenID uint
 	return reports, nil
 }
 
-func (r *ReportRepositoryImpl) Update(status string, reportID int) (*entity.Report, error) {
-	ctx, cancel := newDBContext()
+func (r *ReportRepositoryImpl) Update(ctx context.Context, status string, reportID int) (*entity.Report, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	stmt := `UPDATE reports

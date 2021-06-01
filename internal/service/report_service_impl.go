@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,6 +36,7 @@ func NewReportService(
 }
 
 func (s *ReportServiceImpl) Create(
+	ctx context.Context,
 	report *entity.Report,
 	image multipart.File,
 	header *multipart.FileHeader) (*entity.Report, error) {
@@ -98,11 +100,11 @@ func (s *ReportServiceImpl) Create(
 	report.ImageURL = predictResult.Data.ImageUrl
 	report.Classes = predictResult.Data.Classes
 
-	user, err := s.UserRepository.Get(report.UserID)
+	user, err := s.UserRepository.Get(ctx, report.UserID)
 	if err != nil {
 		return nil, err
 	}
-	report, err = s.ReportRepository.Create(user.ID, report)
+	report, err = s.ReportRepository.Create(ctx, user.ID, report)
 	if err != nil {
 		return nil, err
 	}
@@ -111,16 +113,16 @@ func (s *ReportServiceImpl) Create(
 	return report, nil
 }
 
-func (s *ReportServiceImpl) GetAll(limit, lastseenID uint64) ([]*entity.Report, error) {
-	return s.ReportRepository.GetAll(limit, lastseenID)
+func (s *ReportServiceImpl) GetAll(ctx context.Context, limit, lastseenID uint64) ([]*entity.Report, error) {
+	return s.ReportRepository.GetAll(ctx, limit, lastseenID)
 }
 
-func (s *ReportServiceImpl) GetAllByUserID(userID int, limit, lastseenID uint64) ([]*entity.Report, error) {
-	return s.ReportRepository.GetAllByUserID(userID, limit, lastseenID)
+func (s *ReportServiceImpl) GetAllByUserID(ctx context.Context, userID int, limit, lastseenID uint64) ([]*entity.Report, error) {
+	return s.ReportRepository.GetAllByUserID(ctx, userID, limit, lastseenID)
 }
 
-func (s *ReportServiceImpl) Update(status string, reportID int) (*entity.Report, error) {
-	return s.ReportRepository.Update(status, reportID)
+func (s *ReportServiceImpl) Update(ctx context.Context, status string, reportID int) (*entity.Report, error) {
+	return s.ReportRepository.Update(ctx, status, reportID)
 }
 
 func allowedFileFormats(format string) bool {

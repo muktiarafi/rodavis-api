@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -20,8 +21,8 @@ func NewUserRepository(db *driver.DB) UserRepository {
 	}
 }
 
-func (r *UserRepositoryImpl) Create(user *entity.User) (*entity.User, error) {
-	ctx, cancel := newDBContext()
+func (r *UserRepositoryImpl) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	stmt := `INSERT INTO users (name, phone_number, email, password)
@@ -76,8 +77,8 @@ func (r *UserRepositoryImpl) Create(user *entity.User) (*entity.User, error) {
 	return newUser, nil
 }
 
-func (r *UserRepositoryImpl) Get(userID int) (*entity.User, error) {
-	ctx, cancel := newDBContext()
+func (r *UserRepositoryImpl) Get(ctx context.Context, userID int) (*entity.User, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	stmt := `SELECT * FROM users
@@ -113,8 +114,8 @@ func (r *UserRepositoryImpl) Get(userID int) (*entity.User, error) {
 	return user, nil
 }
 
-func (r *UserRepositoryImpl) GetByEmail(email string) (*entity.User, error) {
-	ctx, cancel := newDBContext()
+func (r *UserRepositoryImpl) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
 	stmt := `SELECT * FROM users

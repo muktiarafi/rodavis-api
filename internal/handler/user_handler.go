@@ -43,7 +43,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.UserService.Create(createUserDTO)
+	user, err := h.UserService.Create(r.Context(), createUserDTO)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -64,7 +64,7 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.UserService.Auth(loginDTO)
+	user, err := h.UserService.Auth(r.Context(), loginDTO)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -80,7 +80,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.UserService.Get(userPayload.ID)
+	user, err := h.UserService.Get(r.Context(), userPayload.ID)
 	if err != nil {
 		api.SendError(w, err)
 		return

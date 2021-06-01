@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
@@ -21,7 +22,7 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 	}
 }
 
-func (s *UserServiceImpl) Create(createUserDTO *model.CreateUserDTO) (*model.UserDTO, error) {
+func (s *UserServiceImpl) Create(ctx context.Context, createUserDTO *model.CreateUserDTO) (*model.UserDTO, error) {
 	const op = "UserServiceImpl.Create"
 	hash, err := bcrypt.GenerateFromPassword([]byte(createUserDTO.Password), 12)
 	if err != nil {
@@ -39,7 +40,7 @@ func (s *UserServiceImpl) Create(createUserDTO *model.CreateUserDTO) (*model.Use
 		PhoneNumber: createUserDTO.PhoneNumber,
 	}
 
-	newUser, err = s.UserRepository.Create(newUser)
+	newUser, err = s.UserRepository.Create(ctx, newUser)
 	if err != nil {
 		return nil, err
 	}
@@ -61,9 +62,9 @@ func (s *UserServiceImpl) Create(createUserDTO *model.CreateUserDTO) (*model.Use
 	return userDTO, nil
 }
 
-func (s *UserServiceImpl) Auth(loginDTO *model.LoginDTO) (*model.UserDTO, error) {
+func (s *UserServiceImpl) Auth(ctx context.Context, loginDTO *model.LoginDTO) (*model.UserDTO, error) {
 	const op = "UserServiceImpl.Auth"
-	user, err := s.UserRepository.GetByEmail(loginDTO.Email)
+	user, err := s.UserRepository.GetByEmail(ctx, loginDTO.Email)
 	if err != nil {
 		if exc, ok := err.(*api.Exception); ok {
 			if exc.Err == sql.ErrNoRows {
@@ -105,6 +106,6 @@ func (s *UserServiceImpl) Auth(loginDTO *model.LoginDTO) (*model.UserDTO, error)
 	return userDTO, nil
 }
 
-func (s *UserServiceImpl) Get(userID int) (*entity.User, error) {
-	return s.UserRepository.Get(userID)
+func (s *UserServiceImpl) Get(ctx context.Context, userID int) (*entity.User, error) {
+	return s.UserRepository.Get(ctx, userID)
 }

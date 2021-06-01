@@ -108,7 +108,7 @@ func (h *ReportHandler) NewReport(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	report, err = h.ReportService.Create(report, image, header)
+	report, err = h.ReportService.Create(r.Context(), report, image, header)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -131,7 +131,7 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 		lastseenID, _ = strconv.ParseUint(lastseenIDStr, 10, 64)
 	}
 
-	reports, err := h.ReportService.GetAll(limit, lastseenID)
+	reports, err := h.ReportService.GetAll(r.Context(), limit, lastseenID)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -160,7 +160,7 @@ func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request)
 		lastseenID, _ = strconv.ParseUint(lastseenIDStr, 10, 64)
 	}
 
-	reports, err := h.ReportService.GetAllByUserID(userPayload.ID, limit, lastseenID)
+	reports, err := h.ReportService.GetAllByUserID(r.Context(), userPayload.ID, limit, lastseenID)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -212,7 +212,7 @@ func (h *ReportHandler) UpdateReport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	report, err := h.ReportService.Update(updateReportDTO.Status, reportID)
+	report, err := h.ReportService.Update(r.Context(), updateReportDTO.Status, reportID)
 	if err != nil {
 		api.SendError(w, err)
 		return
