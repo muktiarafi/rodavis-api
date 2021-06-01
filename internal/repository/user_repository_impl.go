@@ -48,7 +48,7 @@ func (r *UserRepositoryImpl) Create(user *entity.User) (*entity.User, error) {
 		&newUser.UpdatedAt,
 	); err != nil {
 		if pgerr, ok := err.(*pgconn.PgError); ok {
-			if pgerr.ConstraintName == "unique_email" {
+			if pgerr.ConstraintName == "users_email_key" {
 				return nil, api.NewSingleMessageException(
 					api.ECONFLICT,
 					op,
@@ -57,12 +57,14 @@ func (r *UserRepositoryImpl) Create(user *entity.User) (*entity.User, error) {
 				)
 			}
 
-			return nil, api.NewSingleMessageException(
-				api.ECONFLICT,
-				op,
-				"Phonenumber already taken",
-				errors.New("trying to register with already taken phonenumber"),
-			)
+			if pgerr.ConstraintName == "users_phone_number_key" {
+				return nil, api.NewSingleMessageException(
+					api.ECONFLICT,
+					op,
+					"Phonenumber already taken",
+					errors.New("trying to register with already taken phonenumber"),
+				)
+			}
 		}
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
