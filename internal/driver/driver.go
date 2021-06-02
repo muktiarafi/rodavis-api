@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"context"
 	"database/sql"
 	"os"
 	"path/filepath"
@@ -31,7 +32,9 @@ func ConnectSQL(dsn string, withMigrate bool) (*DB, error) {
 	db.SetMaxIdleConns(maxIdleDBConn)
 	db.SetConnMaxLifetime(maxDBLifetime)
 
-	if err := db.Ping(); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
 		return nil, err
 	}
 
