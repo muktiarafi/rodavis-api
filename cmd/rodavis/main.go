@@ -20,7 +20,7 @@ func main() {
 	httpServer := &http.Server{
 		Addr:         addr,
 		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  15 * time.Second,
 		Handler:      app.Mux,
 	}
