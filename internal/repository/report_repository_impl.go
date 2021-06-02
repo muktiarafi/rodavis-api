@@ -119,7 +119,7 @@ func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uin
 			&report.Address,
 			&location.Lat,
 			&location.Lng,
-			&report.Address,
+			&report.DateReported,
 		); err != nil {
 			return nil, api.NewExceptionWithSourceLocation(
 				op,
@@ -195,7 +195,7 @@ func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, l
 			&report.Address,
 			&location.Lat,
 			&location.Lng,
-			&report.Address,
+			&report.DateReported,
 		); err != nil {
 			return nil, api.NewExceptionWithSourceLocation(
 				op,
