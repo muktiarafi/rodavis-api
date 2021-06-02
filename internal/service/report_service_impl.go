@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
+	"time"
 
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
@@ -71,11 +72,32 @@ func (s *ReportServiceImpl) Create(
 		)
 	}
 	writer.Close()
-	res, err := http.Post(s.PredictAPIURL, writer.FormDataContentType(), body)
+	timeoutCTX, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(timeoutCTX, http.MethodPost, s.PredictAPIURL, body)
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
-			"io.Copy",
+			"http.NewRequestWithContext",
+			err,
+		)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	client := http.DefaultClient
+	res, err := client.Do(req)
+	if err != nil {
+		if err == context.DeadlineExceeded {
+			return nil, api.NewSingleMessageException(
+				api.EUNAVAILABLE,
+				op,
+				"Prediction Service Unavailable. Service might be still starting up. Try Again later.",
+				err,
+			)
+		}
+		return nil, api.NewExceptionWithSourceLocation(
+			op,
+			"client.Do",
 			err,
 		)
 	}

@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	EUNAVAILABLE  = "Service Unavailable"
 	EINTERNAL     = "Internal Error"
 	EUNAUTHORIZED = "Not Authorized"
 	ECONFLICT     = "Conflict"
@@ -82,6 +83,8 @@ func ExceptionCodeToHTTPStatusCode(code string) (statusCode int) {
 		statusCode = http.StatusNotFound
 	case ECONFLICT:
 		statusCode = http.StatusConflict
+	case EUNAVAILABLE:
+		statusCode = http.StatusServiceUnavailable
 	default:
 		statusCode = http.StatusInternalServerError
 	}
