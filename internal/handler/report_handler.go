@@ -132,8 +132,8 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 		limit, err = strconv.ParseUint(limitStr, 10, 64)
 		if err != nil {
 			exc := api.NewSingleMessageException(
-				op,
 				api.EINVALID,
+				op,
 				"Invalid limit argument",
 				err,
 			)
@@ -146,8 +146,8 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 		lastseenID, err = strconv.ParseUint(lastseenIDStr, 10, 64)
 		if err != nil {
 			exc := api.NewSingleMessageException(
-				op,
 				api.EINVALID,
+				op,
 				"Invalid lastseenid argument",
 				err,
 			)
