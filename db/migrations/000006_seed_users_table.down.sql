@@ -1,1 +1,1 @@
-DROP FROM users;
+DELETE FROM users;
