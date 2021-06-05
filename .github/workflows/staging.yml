@@ -1,0 +1,74 @@
+name: main
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Test
+        run: |
+          export PREDICT_API_URL=${{ secrets.PREDICT_API_URL }}
+          go test -v ./...
+
+  build_and_deploy:
+    needs: [test]
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: asia.gcr.io/${{ secrets.GCP_PROJECT_ID}}/rodavis-api
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Retrieve Key
+        run: |
+          echo "${{ secrets.PGP_SA_KEY }}" > key.json.asc
+          gpg -d --passphrase "${{ secrets.PGP_PASSPHRASE }}" --batch key.json.asc > key.json
+
+      - name: Authenticate GCP
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build Image
+        run: docker build -t $IMAGE_NAME .
+
+      - name: Push to GCR
+        run: docker push $IMAGE_NAME
+
+      - name: deploy to cloud run
+        run: |
+          gcloud run deploy rodavis-api \
+          --project ${{ secrets.GCP_PROJECT_ID }} \
+          --image $IMAGE_NAME \
+          --region asia-southeast2 \
+          --platform managed \
+          --allow-unauthenticated \
+          --add-cloudsql-instances ${{ secrets.INSTANCE_CONNECTION_NAME }} \
+          --set-env-vars="INSTANCE_CONNECTION_NAME=${{ secrets.INSTANCE_CONNECTION_NAME }}" \
+          --set-env-vars="DB_HOST=${{ secrets.DB_HOST }}" \
+          --set-env-vars="DB_PORT=${{ secrets.DB_PORT }}" \
+          --set-env-vars="DB_USER=${{ secrets.DB_USER }}" \
+          --set-env-vars="DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+          --set-env-vars="DB_NAME=${{ secrets.DB_NAME }}" \
+          --set-env-vars="JWT_KEY=${{ secrets.JWT_KEY }}" \
+          --set-env-vars="PREDICT_API_URL=${{ secrets.PREDICT_API_URL }}"
