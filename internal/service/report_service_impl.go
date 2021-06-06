@@ -101,6 +101,7 @@ func (s *ReportServiceImpl) Create(
 			err,
 		)
 	}
+	defer res.Body.Close()
 
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
