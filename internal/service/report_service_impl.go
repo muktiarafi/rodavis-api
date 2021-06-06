@@ -91,7 +91,7 @@ func (s *ReportServiceImpl) Create(
 			return nil, api.NewSingleMessageException(
 				api.EUNAVAILABLE,
 				op,
-				"Prediction Service Unavailable. Service might be still starting up. Try Again later.",
+				"Timed out when trying to predict image. Please Try Again",
 				err,
 			)
 		}
@@ -101,6 +101,7 @@ func (s *ReportServiceImpl) Create(
 			err,
 		)
 	}
+
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
