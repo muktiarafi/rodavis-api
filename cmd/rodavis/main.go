@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"syscall"
 	"time"
 
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/logger"
@@ -27,7 +28,7 @@ func main() {
 
 	done := make(chan bool)
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	const op = "main"
 	go func() {
