@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -87,7 +88,7 @@ func (s *ReportServiceImpl) Create(
 	client := http.DefaultClient
 	res, err := client.Do(req)
 	if err != nil {
-		if err == context.DeadlineExceeded {
+		if uerr, ok := err.(*url.Error); ok && uerr.Timeout() {
 			return nil, api.NewSingleMessageException(
 				api.EUNAVAILABLE,
 				op,
