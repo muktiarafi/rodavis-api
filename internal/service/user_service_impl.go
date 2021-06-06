@@ -66,15 +66,13 @@ func (s *UserServiceImpl) Auth(ctx context.Context, loginDTO *model.LoginDTO) (*
 	const op = "UserServiceImpl.Auth"
 	user, err := s.UserRepository.GetByEmail(ctx, loginDTO.Email)
 	if err != nil {
-		if exc, ok := err.(*api.Exception); ok {
-			if exc.Err == sql.ErrNoRows {
-				return nil, api.NewSingleMessageException(
-					api.EINVALID,
-					op,
-					"Invalid Email or Password",
-					err,
-				)
-			}
+		if exc, ok := err.(*api.Exception); ok && exc.Err == sql.ErrNoRows {
+			return nil, api.NewSingleMessageException(
+				api.EINVALID,
+				op,
+				"Invalid Email or Password",
+				err,
+			)
 		}
 		return nil, err
 	}
