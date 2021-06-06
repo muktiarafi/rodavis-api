@@ -104,6 +104,13 @@ func (s *ReportServiceImpl) Create(
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		return nil, &api.Exception{
+			Op:  op,
+			Err: errors.New("prediction service not returning 200 OK"),
+		}
+	}
+
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
