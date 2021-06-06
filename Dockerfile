@@ -20,4 +20,4 @@ COPY db/migrations db/migrations
 COPY key.json .
 EXPOSE 8080
 
-ENTRYPOINT [ "/app/main" ]
+ENTRYPOINT [ "./main" ]
