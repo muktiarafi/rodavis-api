@@ -44,7 +44,7 @@ func main() {
 	}()
 
 	logger.Notice(op, "listening on port "+addr)
-	if err := httpServer.ListenAndServe(); err != nil {
+	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		_, file, line, _ := runtime.Caller(0)
 		logger.Error(op, &model.SourceLocation{
 			File:     file,
