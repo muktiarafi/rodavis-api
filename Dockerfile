@@ -6,18 +6,20 @@ ENV GO111MODULE=on \
     GOARCH=amd64
 
 WORKDIR /dist
+
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
+RUN go mod verify
 COPY . .
-RUN go build -o main cmd/rodavis/main.go
+RUN go build -o main cmd/*/main.go
 
-FROM alpine
+FROM gcr.io/distroless/static
 
 WORKDIR /app
+
 COPY --from=builder /dist/main .
 COPY db/migrations db/migrations
-COPY key.json .
 EXPOSE 8080
 
-ENTRYPOINT [ "./main" ]
+ENTRYPOINT [ "/app/main" ]
