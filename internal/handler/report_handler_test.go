@@ -572,7 +572,7 @@ func TestReportHandlerUpdateReport(t *testing.T) {
 
 		router.ServeHTTP(res, req)
 
-		assertResponseCode(t, http.StatusUnauthorized, res.Code)
+		assertResponseCode(t, http.StatusForbidden, res.Code)
 	})
 
 	t.Run("update with invalid payload", func(t *testing.T) {

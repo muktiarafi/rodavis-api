@@ -44,11 +44,13 @@ func (s *UserServiceImpl) Create(ctx context.Context, createUserDTO *model.Creat
 		PhoneNumber: createUserDTO.PhoneNumber,
 	}
 
-	driver.WithTransaction(s.App.DB, func(e driver.Executor) error {
+	if err = driver.WithTransaction(s.App.DB, func(e driver.Executor) error {
 		newUser, err = s.UserRepository.Create(ctx, e, newUser)
 
 		return err
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	token, err := utils.CreateToken(&model.UserPayload{newUser.ID, newUser.Email, newUser.Role})
 	if err != nil {
