@@ -11,11 +11,13 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/ory/dockertest/v3"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/config"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
@@ -43,6 +45,7 @@ var admin *model.LoginDTO
 func TestMain(m *testing.M) {
 	router = chi.NewRouter()
 	db := newTestDatabase()
+	mockPredictServer := mockPredictServer()
 
 	configApp := &config.App{
 		DB: db,
@@ -62,7 +65,7 @@ func TestMain(m *testing.M) {
 	userHandler.Route(router)
 
 	reportRepo := repository.NewReportRepository()
-	predictAPIURL := os.Getenv("PREDICT_API_URL")
+	predictAPIURL := mockPredictServer.URL
 	reportSRV := service.NewReportService(configApp, reportRepo, userRepo, predictAPIURL)
 	reportHandler := NewReportHandler(val, reportSRV)
 	reportHandler.Route(router)
@@ -89,6 +92,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not purge resource: %s", err)
 	}
 
+	mockPredictServer.Close()
 	os.Exit(code)
 }
 
@@ -120,6 +124,35 @@ func newTestDatabase() *sql.DB {
 	}
 
 	return db
+}
+
+func mockPredictServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("ada yang masuk nih")
+		image, header, err := r.FormFile("image")
+		if err != nil {
+			api.NewResponse(http.StatusBadRequest, api.EINTERNAL, "Server Error").SendJSON(w)
+			return
+		}
+		defer image.Close()
+
+		filenameSplit := strings.Split(header.Filename, ".")
+		format := filenameSplit[len(filenameSplit)-1]
+		switch format {
+		case "jpg", "jpeg", "png":
+			classes := []string{"D00", "D01", "D10", "D11", "D20", "D40", "D43", "D44", "D50"}
+			predictResult := &model.PredictResult{
+				ImageUrl: "https://storage.googleapis.com/test/predict.jpg",
+				Classes:  classes,
+				Score:    90,
+			}
+
+			api.NewResponse(http.StatusOK, "OK", predictResult).SendJSON(w)
+			return
+		}
+
+		api.NewResponse(http.StatusBadRequest, api.EINVALID, "Mimetype not supported").SendJSON(w)
+	}))
 }
 
 func register(createUserDTO *model.CreateUserDTO) (*model.UserDTO, *httptest.ResponseRecorder) {
