@@ -233,9 +233,9 @@ func (h *ReportHandler) UpdateReport(w http.ResponseWriter, r *http.Request) {
 
 	if userPayload.Role != "ADMIN" {
 		exc := api.NewSingleMessageException(
-			api.EUNAUTHORIZED,
+			api.EFORBIDDEN,
 			op,
-			"Not Authorized",
+			"Forbidden",
 			errors.New("trying to access admin endpoint without valid credential"),
 		)
 		api.SendError(w, exc)
