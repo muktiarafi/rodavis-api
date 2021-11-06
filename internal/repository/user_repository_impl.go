@@ -11,17 +11,13 @@ import (
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 )
 
-type UserRepositoryImpl struct {
-	*driver.DB
+type UserRepositoryImpl struct{}
+
+func NewUserRepository() UserRepository {
+	return &UserRepositoryImpl{}
 }
 
-func NewUserRepository(db *driver.DB) UserRepository {
-	return &UserRepositoryImpl{
-		DB: db,
-	}
-}
-
-func (r *UserRepositoryImpl) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+func (r *UserRepositoryImpl) Create(ctx context.Context, e driver.Executor, user *entity.User) (*entity.User, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -31,7 +27,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *entity.User) (*en
 
 	const op = "UserRepositoryImpl.Create"
 	newUser := new(entity.User)
-	if err := r.SQL.QueryRowContext(
+	if err := e.QueryRowContext(
 		ctx,
 		stmt,
 		user.Name,
@@ -77,7 +73,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *entity.User) (*en
 	return newUser, nil
 }
 
-func (r *UserRepositoryImpl) Get(ctx context.Context, userID int) (*entity.User, error) {
+func (r *UserRepositoryImpl) Get(ctx context.Context, e driver.Executor, userID int) (*entity.User, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -85,7 +81,7 @@ func (r *UserRepositoryImpl) Get(ctx context.Context, userID int) (*entity.User,
 	WHERE id = $1`
 
 	user := new(entity.User)
-	if err := r.SQL.QueryRowContext(ctx, stmt, userID).Scan(
+	if err := e.QueryRowContext(ctx, stmt, userID).Scan(
 		&user.ID,
 		&user.Name,
 		&user.PhoneNumber,
@@ -114,7 +110,7 @@ func (r *UserRepositoryImpl) Get(ctx context.Context, userID int) (*entity.User,
 	return user, nil
 }
 
-func (r *UserRepositoryImpl) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (r *UserRepositoryImpl) GetByEmail(ctx context.Context, e driver.Executor, email string) (*entity.User, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -122,7 +118,7 @@ func (r *UserRepositoryImpl) GetByEmail(ctx context.Context, email string) (*ent
 	WHERE email = $1`
 
 	user := new(entity.User)
-	if err := r.SQL.QueryRowContext(ctx, stmt, email).Scan(
+	if err := e.QueryRowContext(ctx, stmt, email).Scan(
 		&user.ID,
 		&user.Name,
 		&user.PhoneNumber,

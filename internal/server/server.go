@@ -45,18 +45,22 @@ func New() *App {
 		}, err)
 		log.Fatal(err)
 	}
-	userRepo := repository.NewUserRepository(db)
-	userSRV := service.NewUserService(userRepo)
+
+	configApp := &config.App{
+		DB: db,
+	}
+	userRepo := repository.NewUserRepository()
+	userSVC := service.NewUserService(configApp, userRepo)
 
 	val := validator.New()
 	trans := validation.NewDefaultTranslator(val)
 	v := validation.NewValidator(val, trans)
-	userHandler := handler.NewUserHandler(v, userSRV)
+	userHandler := handler.NewUserHandler(v, userSVC)
 	userHandler.Route(r)
 
 	predictAPIURL := os.Getenv("PREDICT_API_URL")
-	reportRepo := repository.NewReportRepository(db)
-	reportSRV := service.NewReportService(reportRepo, userRepo, predictAPIURL)
+	reportRepo := repository.NewReportRepository()
+	reportSRV := service.NewReportService(configApp, reportRepo, userRepo, predictAPIURL)
 	reportHandler := handler.NewReportHandler(v, reportSRV)
 	reportHandler.Route(r)
 
@@ -72,7 +76,7 @@ func New() *App {
 
 	app := &App{
 		Mux: r,
-		DB:  db.SQL,
+		DB:  db,
 	}
 	return app
 }

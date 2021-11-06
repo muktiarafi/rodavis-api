@@ -156,7 +156,11 @@ func (h *ReportHandler) GetAllReport(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	reports, err := h.ReportService.GetAll(r.Context(), limit, lastseenID)
+	pagination := &model.Pagination{
+		Limit:      limit,
+		LastseenID: lastseenID,
+	}
+	reports, err := h.ReportService.GetAll(r.Context(), pagination)
 	if err != nil {
 		api.SendError(w, err)
 		return
@@ -206,7 +210,11 @@ func (h *ReportHandler) GetAllUserReport(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	reports, err := h.ReportService.GetAllByUserID(r.Context(), userPayload.ID, limit, lastseenID)
+	pagination := &model.Pagination{
+		Limit:      limit,
+		LastseenID: lastseenID,
+	}
+	reports, err := h.ReportService.GetAllByUserID(r.Context(), userPayload.ID, pagination)
 	if err != nil {
 		api.SendError(w, err)
 		return

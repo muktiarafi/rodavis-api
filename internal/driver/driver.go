@@ -12,17 +12,13 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-type DB struct {
-	SQL *sql.DB
-}
-
 const (
 	maxOpenDBConn = 10
 	maxIdleDBConn = 5
 	maxDBLifetime = 5 * time.Minute
 )
 
-func ConnectSQL(dsn string, withMigrate bool) (*DB, error) {
+func ConnectSQL(dsn string, withMigrate bool) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
@@ -49,5 +45,5 @@ func ConnectSQL(dsn string, withMigrate bool) (*DB, error) {
 		}
 	}
 
-	return &DB{db}, nil
+	return db, nil
 }

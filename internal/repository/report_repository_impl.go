@@ -9,19 +9,21 @@ import (
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 )
 
-type ReportRepositoryImpl struct {
-	*driver.DB
+type ReportRepositoryImpl struct{}
+
+func NewReportRepository() ReportRepository {
+	return &ReportRepositoryImpl{}
 }
 
-func NewReportRepository(db *driver.DB) ReportRepository {
-	return &ReportRepositoryImpl{
-		DB: db,
-	}
-}
-
-func (r *ReportRepositoryImpl) Create(ctx context.Context, userID int, report *entity.Report) (*entity.Report, error) {
+func (r *ReportRepositoryImpl) Create(
+	ctx context.Context,
+	e driver.Executor,
+	userID int,
+	report *entity.Report,
+) (*entity.Report, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -30,7 +32,7 @@ func (r *ReportRepositoryImpl) Create(ctx context.Context, userID int, report *e
 	RETURNING id, status, image_url, classes, note, address, lat, lng, date_reported`
 
 	var cls pgtype.EnumArray
-	if err := r.SQL.QueryRowContext(
+	if err := e.QueryRowContext(
 		ctx,
 		stmt,
 		report.ImageURL,
@@ -53,7 +55,7 @@ func (r *ReportRepositoryImpl) Create(ctx context.Context, userID int, report *e
 	); err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			"ReportRepositoryImpl.Create",
-			"r.SQL.QueryRowContext",
+			"r.Executor.QueryRowContext",
 			err,
 		)
 	}
@@ -66,7 +68,7 @@ func (r *ReportRepositoryImpl) Create(ctx context.Context, userID int, report *e
 	return report, nil
 }
 
-func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uint64) ([]*entity.Report, error) {
+func (r *ReportRepositoryImpl) GetAll(ctx context.Context, e driver.Executor, pagination *model.Pagination) ([]*entity.Report, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -75,13 +77,13 @@ func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uin
 		Select("r.id", "name", "status", "image_url", "classes", "note", "address", "lat", "lng", "date_reported").
 		From("users AS u").Join("reports AS r ON u.id = r.user_id").PlaceholderFormat(squirrel.Dollar).OrderBy("r.id DESC")
 
-	if limit > 0 {
-		queryBuilder = queryBuilder.Limit(limit)
+	if pagination.Limit > 0 {
+		queryBuilder = queryBuilder.Limit(pagination.Limit)
 	}
 
-	if lastseenID > 0 {
+	if pagination.LastseenID > 0 {
 		queryBuilder = queryBuilder.Where(squirrel.Lt{
-			"r.id": lastseenID,
+			"r.id": pagination.LastseenID,
 		})
 	}
 
@@ -94,11 +96,11 @@ func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uin
 		)
 	}
 
-	rows, err := r.SQL.QueryContext(ctx, stmt, args...)
+	rows, err := e.QueryContext(ctx, stmt, args...)
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
-			"r.SQL.QueryContext",
+			"r.Executor.QueryContext",
 			err,
 		)
 	}
@@ -139,7 +141,7 @@ func (r *ReportRepositoryImpl) GetAll(ctx context.Context, limit, lastseenID uin
 	return reports, nil
 }
 
-func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, limit, lastseenID uint64) ([]*entity.Report, error) {
+func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, e driver.Executor, userID int, pagination *model.Pagination) ([]*entity.Report, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -151,13 +153,13 @@ func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, l
 			"r.user_id": userID,
 		})
 
-	if limit > 0 {
-		queryBuilder = queryBuilder.Limit(limit)
+	if pagination.Limit > 0 {
+		queryBuilder = queryBuilder.Limit(pagination.Limit)
 	}
 
-	if lastseenID > 0 {
+	if pagination.LastseenID > 0 {
 		queryBuilder = queryBuilder.Where(squirrel.Lt{
-			"r.id": lastseenID,
+			"r.id": pagination.LastseenID,
 		})
 	}
 
@@ -170,11 +172,11 @@ func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, l
 		)
 	}
 
-	rows, err := r.SQL.QueryContext(ctx, stmt, args...)
+	rows, err := e.QueryContext(ctx, stmt, args...)
 	if err != nil {
 		return nil, api.NewExceptionWithSourceLocation(
 			op,
-			"r.SQL.QueryContext",
+			"r.Executor.QueryContext",
 			err,
 		)
 	}
@@ -215,7 +217,7 @@ func (r *ReportRepositoryImpl) GetAllByUserID(ctx context.Context, userID int, l
 	return reports, nil
 }
 
-func (r *ReportRepositoryImpl) Update(ctx context.Context, status string, reportID int) (*entity.Report, error) {
+func (r *ReportRepositoryImpl) Update(ctx context.Context, e driver.Executor, status string, reportID int) (*entity.Report, error) {
 	ctx, cancel := newDBContext(ctx)
 	defer cancel()
 
@@ -227,7 +229,7 @@ func (r *ReportRepositoryImpl) Update(ctx context.Context, status string, report
 	report := new(entity.Report)
 	location := new(entity.Location)
 	var cls pgtype.EnumArray
-	if err := r.SQL.QueryRowContext(ctx, stmt, status, reportID).Scan(
+	if err := e.QueryRowContext(ctx, stmt, status, reportID).Scan(
 		&report.ID,
 		&report.Status,
 		&report.ImageURL,
@@ -248,7 +250,7 @@ func (r *ReportRepositoryImpl) Update(ctx context.Context, status string, report
 		}
 		return nil, api.NewExceptionWithSourceLocation(
 			"ReportRepositoryImpl.Update",
-			"r.SQL.QueryRowContext",
+			"r.Executor.QueryRowContext",
 			err,
 		)
 	}

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/api"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/config"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/repository"
@@ -13,11 +15,13 @@ import (
 )
 
 type UserServiceImpl struct {
+	*config.App
 	repository.UserRepository
 }
 
-func NewUserService(userRepo repository.UserRepository) UserService {
+func NewUserService(app *config.App, userRepo repository.UserRepository) UserService {
 	return &UserServiceImpl{
+		App:            app,
 		UserRepository: userRepo,
 	}
 }
@@ -40,10 +44,11 @@ func (s *UserServiceImpl) Create(ctx context.Context, createUserDTO *model.Creat
 		PhoneNumber: createUserDTO.PhoneNumber,
 	}
 
-	newUser, err = s.UserRepository.Create(ctx, newUser)
-	if err != nil {
-		return nil, err
-	}
+	driver.WithTransaction(s.App.DB, func(e driver.Executor) error {
+		newUser, err = s.UserRepository.Create(ctx, e, newUser)
+
+		return err
+	})
 
 	token, err := utils.CreateToken(&model.UserPayload{newUser.ID, newUser.Email, newUser.Role})
 	if err != nil {
@@ -64,7 +69,7 @@ func (s *UserServiceImpl) Create(ctx context.Context, createUserDTO *model.Creat
 
 func (s *UserServiceImpl) Auth(ctx context.Context, loginDTO *model.LoginDTO) (*model.UserDTO, error) {
 	const op = "UserServiceImpl.Auth"
-	user, err := s.UserRepository.GetByEmail(ctx, loginDTO.Email)
+	user, err := s.UserRepository.GetByEmail(ctx, s.App.DB, loginDTO.Email)
 	if err != nil {
 		if exc, ok := err.(*api.Exception); ok && exc.Err == sql.ErrNoRows {
 			return nil, api.NewSingleMessageException(
@@ -105,5 +110,5 @@ func (s *UserServiceImpl) Auth(ctx context.Context, loginDTO *model.LoginDTO) (*
 }
 
 func (s *UserServiceImpl) Get(ctx context.Context, userID int) (*entity.User, error) {
-	return s.UserRepository.Get(ctx, userID)
+	return s.UserRepository.Get(ctx, s.App.DB, userID)
 }

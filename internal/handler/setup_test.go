@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/ory/dockertest/v3"
+	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/config"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/driver"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/entity"
 	"gitlab.com/harta-tahta-coursera/rodavis-api/internal/model"
@@ -41,17 +42,18 @@ var admin *model.LoginDTO
 
 func TestMain(m *testing.M) {
 	router = chi.NewRouter()
-	db := &driver.DB{
-		SQL: newTestDatabase(),
-	}
+	db := newTestDatabase()
 
-	userRepo := repository.NewUserRepository(db)
+	configApp := &config.App{
+		DB: db,
+	}
+	userRepo := repository.NewUserRepository()
 
 	pwd, _ := os.Getwd()
 	assetsPath = filepath.Join(pwd, "..", "..", "assets")
 	imagePath = filepath.Join(assetsPath, "images")
 	savePath = filepath.Join(imagePath, "tests")
-	userSRV := service.NewUserService(userRepo)
+	userSRV := service.NewUserService(configApp, userRepo)
 
 	v := validator.New()
 	trans := validation.NewDefaultTranslator(v)
@@ -59,9 +61,9 @@ func TestMain(m *testing.M) {
 	userHandler := NewUserHandler(val, userSRV)
 	userHandler.Route(router)
 
-	reportRepo := repository.NewReportRepository(db)
+	reportRepo := repository.NewReportRepository()
 	predictAPIURL := os.Getenv("PREDICT_API_URL")
-	reportSRV := service.NewReportService(reportRepo, userRepo, predictAPIURL)
+	reportSRV := service.NewReportService(configApp, reportRepo, userRepo, predictAPIURL)
 	reportHandler := NewReportHandler(val, reportSRV)
 	reportHandler.Route(router)
 
@@ -146,14 +148,14 @@ func assertResponseCode(t testing.TB, want, got int) {
 	}
 }
 
-func createAdmin(createUserDTO *model.CreateUserDTO, db *driver.DB) (*entity.User, error) {
+func createAdmin(createUserDTO *model.CreateUserDTO, db *sql.DB) (*entity.User, error) {
 
 	stmt := `INSERT INTO users (name, phone_number, email, password, role)
 	VALUES ($1, $2, $3, $4, $5)
 	RETURNING *`
 
 	newUser := new(entity.User)
-	if err := db.SQL.QueryRow(
+	if err := db.QueryRow(
 		stmt,
 		createUserDTO.Name,
 		createUserDTO.PhoneNumber,
