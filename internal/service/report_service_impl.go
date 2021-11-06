@@ -168,11 +168,9 @@ func (s *ReportServiceImpl) Update(ctx context.Context, status string, reportID 
 }
 
 func allowedFileFormats(format string) bool {
-	formats := []string{"jpg", "jpeg", "png"}
-	for _, v := range formats {
-		if v == format {
-			return true
-		}
+	switch format {
+	case "jpg", "jpeg", "png":
+		return true
 	}
 
 	return false
