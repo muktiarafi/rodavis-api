@@ -31,7 +31,7 @@ jobs:
   
   build_and_deploy:
     needs: [test]
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: ${{ false }} 
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: asia.gcr.io/${{ secrets.GCP_PROJECT_ID}}/rodavis-api
